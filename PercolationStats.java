@@ -28,15 +28,11 @@ public class PercolationStats{
                 i=getI(N,r);      
                 j=getJ(N,r); 
                 pTest.open(i,j);
-                //System.out.println("Open: "+i+", "+j+" ("+r+")");
                 if(pTest.percolates()) break;
             }
             double fractionOpen = (double)(n+1)/size;
             this.percTimeResults[t]=fractionOpen; //record the result of this run
-            //System.out.println("Number of iterations before percolation: "+
-            //                    n+1);
         }       
-
 
     }
    
@@ -59,18 +55,25 @@ public class PercolationStats{
     public double stddev(){
         this.stddev=0; //init the stddev
         double var = 0;  //variance
+        double mean = this.mean();
         for(int i=0; i<this.T; i++){
-            var += Math.pow((this.percTimeResults[i] - this.mean), 2);
+            var += Math.pow((this.percTimeResults[i] - mean), 2);
         }
+        var /= (this.T - 1);
         this.stddev = Math.sqrt(var);
         return this.stddev;
     }
     
     public double confidenceHi(){
-        return 1.0;    
+        double Hi;
+        Hi = this.mean() + (1.96 * this.stddev())/Math.sqrt(this.T);
+        return Hi;
     }
+
     public double confidenceLo(){
-        return 1.0;
+        double Lo;
+        Lo = this.mean() - (1.96 * this.stddev())/Math.sqrt(this.T);
+        return Lo; 
     } 
        
     //Convert index to the ith row of the box 
@@ -92,8 +95,8 @@ public class PercolationStats{
         T = Integer.parseInt(args[1]);
         
         PercolationStats stats = new PercolationStats(N, T);
-        System.out.println("mean        = " + stats.mean());
-        System.out.println("stddev      = " + stats.stddev());         
-
+        System.out.println("mean                    = " + stats.mean());
+        System.out.println("stddev                  = " + stats.stddev());         
+        System.out.println("95% confidence interval = " + stats.confidenceLo() + ", " + stats.confidenceHi());
     }
 }
