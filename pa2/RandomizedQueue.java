@@ -1,4 +1,5 @@
 import java.util.UnsupportedOperationException;
+import java.util.NoSuchElementException;
 import java.util.Iterator;
 
 public class RandomizedQueue<Item> implements Iterable<Item>{
