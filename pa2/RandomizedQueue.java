@@ -21,18 +21,22 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
     public int size(){
         return N;
     }
+    
+    private void resize(int newSize){
+        Item[] newItems = (Item[]) new Object[newSize];
+        for(int i=0; i<size(); i++){ //copy from old to new array
+            newItems[i] = this.items[i];
+        }
+        this.items = newItems;  //reassign the array reference
+    }
 
     public void enqueue(Item item){
+        if(item == null) throw new NullPointerException("Don't queue a null pointer");
         if(items.length == size()){                          //queue is full, double it
-            Item[] newItems = (Item[]) new Object[2*size()]; //doubled array size
-            for(int i=0; i<size(); i++){
-                newItems[i] = items[i];     //copy each element of old array
-            }
-            items = newItems;       //reassign our private array reference
+            resize(2*size());
         }
         items[N++] = item;      //stick the new item in the array,
                                 //and increment the item count
-
     }
     
 //This cannot be in the final version (extra public method):
@@ -42,19 +46,26 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
 //      return s;
 //  }
 
-    //randomly select and remove an item
+    //randomly select and remove an item,
+    //resize by 1/2 when 1/4 full
     public Item dequeue(){
+        if(isEmpty()) throw new NoSuchElementException("Queue underflow");
         int randomIndex;
         randomIndex = StdRandom.uniform(N);        
         //swap the randomly selected index with the last element in the array
         Item temp = items[N-1];
         items[N-1] = items[randomIndex];
-        items[randomIndex] = temp; 
+        items[randomIndex] = temp; //trading places 
+        temp = items[N-1];  //save pointer to the swapped element
         N--;
-        return items[N]; //N is now the last element since it was just decremented
+        if((N>0) && (N <= items.length/4)){
+            resize(items.length/2);
+        }
+        return temp;
     }
     //randomly select and return, but don't remove item
     public Item sample(){
+        if(isEmpty()) throw new NoSuchElementException("Queue underflow"); 
         int randomIndex;
         randomIndex = StdRandom.uniform(N);
         return items[randomIndex];
@@ -102,19 +113,19 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
         System.out.println("Empty?: " + myQ.isEmpty());
         for(int i=0; i<args.length; i++){
             myQ.enqueue(args[i]);
-            System.out.print(args[i]);
+            for(String s: myQ) System.out.print(s);
+            System.out.println("");
         }
         System.out.println("");
         System.out.println("Size: " + myQ.size());
         System.out.println("Empty?: " + myQ.isEmpty());
-        //Give me an iterator
-        Iterator<String> iter1 = myQ.iterator();
-        //Give me another
-        Iterator<String> iter2 = myQ.iterator();
-        while( iter1.hasNext() || iter2.hasNext() ){
-            System.out.print(iter1.next());
-            System.out.print(iter2.next());
+        int max = myQ.size();
+        for(int i = 0; i < max; i++){
+            myQ.dequeue();
+            for(String s: myQ) System.out.print(s);
             System.out.println("");
         }
+        System.out.println("Size: " + myQ.size());
+        System.out.println("Empty?: " + myQ.isEmpty());
     }
 }
