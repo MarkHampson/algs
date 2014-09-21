@@ -27,12 +27,17 @@ public class Point implements Comparable<Point> {
     // slope between this point and that point
     public double slopeTo(Point that) {
         // TODO
+        // may need Double.POSITIVE_INFINITY and Double.NEGATIVE_INFINITY
     }
 
     // is this point lexicographically smaller than that one?
     // comparing y-coordinates and breaking ties by x-coordinates
     public int compareTo(Point that) {
-        // TODO
+        if(this.y > that.y) return 1;
+        else if(this.y < that.y) return -1;
+             else if(this.x > that.x) return 1; // implicitly, this.y == that.y
+                  else if(this.x < that.x) return -1;
+                       else return 0;           //this.x == that.x
     }
 
     // return string representation of this point
