@@ -57,6 +57,7 @@ public class RandomizedQueue<Item> implements Iterable<Item>{
         items[N-1] = items[randomIndex];
         items[randomIndex] = temp; //trading places 
         temp = items[N-1];  //save pointer to the swapped element
+        items[N-1] = null;  //no loitering!
         N--;
         if((N>0) && (N <= items.length/4)){
             resize(items.length/2);
