@@ -2,31 +2,25 @@ import java.util.Arrays;
 
 public class Fast {
 
-    private static int findMin(Point[] p, int origin, int min, int max) {
-
-        Arrays.sort(p, min, max + 1);
-        if(p[origin].compareTo(p[min]) <= 0) {
-            return origin;
-        }
-        else {
-            return min;
-        }
+    private static Point[] copyLine(Point[] p, int origin, int min, int max) {
+        Point[] temp = new Point[max - min + 2];
+        for(int k = 0; k < max - min + 1; k++)
+            temp[k] = p[min + k];
+        temp[max - min + 1] = p[origin];
+        Arrays.sort(temp);
+        return temp;
     }
 
-    private static int findMax(Point[] p, int origin, int min, int max) {
-
-        Arrays.sort(p, min, max + 1);
-        if(p[origin].compareTo(p[max]) >= 0) {
-            return origin;
-        }
-        else {
-            return max;
-        }
+    private static void printPoints(Point[] p, int min, int max) {
+        for(int j = min; j < max; j++) System.out.print(p[j] + " -> ");
+        System.out.println(p[max]);
     }
+
     //Draw all lines eminating from p[i] 
     private static void drawLines(Point[] p, int i, int N) {
         double slope = p[i].slopeTo(p[i + 1]);      //save the first slope to p[i]
         int count = 1;
+        
         for(int j = i + 2; j < N; j++) {
            if(p[i].slopeTo(p[j]) == slope) count++; //this point has the same slope
                                       //as the previous point 
@@ -34,20 +28,10 @@ public class Fast {
                                       //same slope as the previous point
                if(count >= 3) {       //if we got to at least three,
                                       //draw a  line to the previous point
-                   //int min = findMin(p, i, j - 1 - count + 1, j - 1);
-                   //int max = findMax(p, i, j - 1 - count + 1, j - 1);
-                   Point[] temp = new Point[count + 1];
-                   for(int k = 0; k < count; k++) {
-                       temp[k] = p[j - 1 - count + 1 + k];    
-                   }
-                   temp[count] = p[i];
-                   Arrays.sort(temp);
-                   temp[0].drawTo(temp[count]);
-                   for(int k = 0; k < count; k++) {
-                       System.out.print(temp[k] + " -> ");
-                   }
-                   System.out.println(temp[count]);
-                   //p[min].drawTo(p[max]);
+
+                    Point[] temp = copyLine(p, i, j-1-count+1, j-1);
+                    temp[0].drawTo(temp[count]);
+                    printPoints(temp, 0, count);
                }
 
 
@@ -58,9 +42,9 @@ public class Fast {
            //Handle the case where the last point is continuing a line
            if(j == (N - 1)) {
                if(count >= 3) {
-                   int min = findMin(p, i, j - count + 1, j);
-                   int max = findMax(p, i, j - count + 1, j);
-                   p[min].drawTo(p[max]);
+                   Point[] temp = copyLine(p, i, j-count+1, j);
+                   temp[0].drawTo(temp[count]);
+                   printPoints(temp, 0, count);
                }
            }
        }    
@@ -90,7 +74,7 @@ public class Fast {
         StdDraw.setPenRadius(0.001);
         
         //initial position sort
-//        Arrays.sort(p);        
+        Arrays.sort(p);        
         for(int i = 0; i < (N - 3); i++) {
             //sort by slope order from (almost) every point
             Arrays.sort(p, i, N, p[i].SLOPE_ORDER);
