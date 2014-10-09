@@ -104,11 +104,78 @@ public class Board {
     }
 
     public boolean equals(Object y) {  // does this board equal y?
-        return false;   //TODO
+        if(y == this) return true;
+        if(y == null) return false;
+        if(y.getClass() != this.getClass()) return false;
+        Board that = (Board) y;  // cast argument to Board and compare attributes
+        if(that.N != this.N) return false;
+        for(int i = 0; i < N; i++){
+            for(int j = 0; j < N; j++) {
+                if(that.blocks[i][j] != this.blocks[i][j]) return false;
+            }
+        }
+        return true;   
     }
 
-    public void neighbors() { //all neighboring boards
-        //TODO return Iterable<Board>
+    private void copyBlocksTo(int[][] that) {
+        //copy this.blocks to that
+        for(int i = 0; i < N; i++) {
+            for(int j = 0; j < N; j++) {
+                that[i][j] = this.blocks[i][j];
+            }
+        }
+    }
+
+    public Iterable<Board> neighbors() { //all neighboring boards
+        // find the zero, swap above and below, left and right
+        Queue<Board> allNeighbors = new Queue();
+        int x = 0;
+        int y = 0;
+        //find the space tile
+        for(int i = 0; i < N; i++) {
+            for(int j = 0; j < N; j++) {
+                if(blocks[i][j] == 0) {
+                    x = i;
+                    y = j; 
+                    break;
+                }
+            }
+        }
+        // find up to four neighbors       
+        if(x > 0) {
+            int[][] up = new int[N][N];
+            copyBlocksTo(up);  //copy this data to up
+            int temp = up[x - 1][y]; //tile above
+            up[x - 1][y] = up[x][y]; //swap with the space
+            up[x][y] = temp;        
+            allNeighbors.enqueue(new Board(up));  // put the new neighbor on the queue
+        }
+        if(x < (N - 1)) {
+            int[][] down = new int[N][N]; 
+            copyBlocksTo(down);
+            int temp = down[x + 1][y]; //tile below
+            down[x + 1][y] = down[x][y]; //swap with the space
+            down[x][y] = temp;
+            allNeighbors.enqueue(new Board(down)); //put it on the queue
+        }
+        if(y > 0) {
+            int[][] left = new int[N][N]; 
+            copyBlocksTo(left);
+            int temp = left[x][y - 1]; // save tile on left
+            left[x][y - 1] = left[x][y];
+            left[x][y] = temp;
+            allNeighbors.enqueue(new Board(left)); //save to queue
+        }
+        if(y < (N - 1)) {
+            int[][] right = new int[N][N]; 
+            copyBlocksTo(right);
+            int temp = right[x][y + 1]; // save tile on right
+            right[x][y + 1] = right[x][y];
+            right[x][y] = temp;
+            allNeighbors.enqueue(new Board(right)); //save to queue
+        }
+
+        return allNeighbors;
     }
 
     //This is the given reference implementation
@@ -126,27 +193,30 @@ public class Board {
 
     public static void main(String[] args){
         int[][] bluh = new int[][] {
-            new int[] {7, 4, 3},
-            new int[] {0, 8, 6},
-            new int[] {2, 1, 5} 
-        };
-        int[][] blah = new int[][] {
             new int[] {1, 2, 3},
             new int[] {4, 5, 6},
             new int[] {7, 8, 0} 
         };
+        int[][] blah = new int[][] {
+            new int[] {1, 2, 4},
+            new int[] {3, 0, 6},
+            new int[] {7, 8, 5} 
+        };
         Board test = new Board(bluh);
         Board tets = new Board(blah);
-        System.out.println("Dimension: " + test.dimension());
-        System.out.println("Hamming distance: " + test.hamming());
-        System.out.println("Manhattan distance: " + test.manhattan());
-        System.out.println("Is goal board? " + test.isGoal());
-        System.out.println("Hamming distance: " + tets.hamming());
-        System.out.println("Manhattan distance: " + tets.manhattan());
-        System.out.println("Is goal board? " + tets.isGoal());      
-        System.out.println(test);
-        System.out.println(tets);
-        System.out.println(test.twin());
+        //System.out.println("Dimension: " + test.dimension());
+        //System.out.println("Hamming distance: " + test.hamming());
+        //System.out.println("Manhattan distance: " + test.manhattan());
+        //System.out.println("Is goal board? " + test.isGoal());
+        //System.out.println("Hamming distance: " + tets.hamming());
+        //System.out.println("Manhattan distance: " + tets.manhattan());
+        //System.out.println("Is goal board? " + tets.isGoal());      
+        //System.out.println(test);
+        //System.out.println(tets);
+        //System.out.println(test.twin());
+        //System.out.println(test.equals(tets));
+        System.out.println("neighbors");
+        for(Board b: tets.neighbors()) System.out.println(b);
     }
 
 }
